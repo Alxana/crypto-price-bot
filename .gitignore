@@ -1,0 +1,38 @@
+# Byte-compiled Python files
+*.pyc
+*.pyo
+__pycache__/
+*.pyd
+*.so
+*.dll
+
+# Virtual environments
+env/
+venv/
+.venv/
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Logs
+*.log
+application.log
+
+# IDE and editor specific files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Config and secret files
+configs/secrets_config.py
+
+# Environment variables
+.env
