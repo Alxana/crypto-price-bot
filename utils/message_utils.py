@@ -1,6 +1,6 @@
 def format_price_update_message(price):
     # Ensure currentPrice and priceChange24 are floats for proper formatting
-    currencies_pair = f"{price['symbol']}-{price["convert_to"]}"
+    currencies_pair = f"{price['symbol']}-{price['convert_to']}"
     current_price = round(float(price['price']), 3)
     price_change_24 = round(float(price['percent_change_24h']), 3)
     price_change_7d = round(float(price['percent_change_7d']), 3)
@@ -31,7 +31,7 @@ def format_price_update_message(price):
 
     # Construct the message with Markdown and monospaced font for alignment
     message = (
-        f"💰 `{price['symbol']:<3}`: *${current_price:>6}* ~"
+        f"💰 `{price['symbol']:<4}`: *${current_price:>6}* ~"
         f" 24h: {change_emoji_24} {price_change_str_24:>6}% ~"
         f" 7d: {change_emoji_7d} {price_change_str_7d:>6}%"
     )

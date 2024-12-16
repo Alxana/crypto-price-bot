@@ -4,5 +4,8 @@
   "SOL": "Solana",
   "TRX": "Tron",
   "XRP": "Ripple",
-  "TON": "Toncoin"
+  "TON": "Toncoin",
+  "W": "Wormhole",
+  "PYTH": "Pyth Network",
+  "OP": "Optimism"
 }

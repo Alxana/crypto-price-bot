@@ -1,7 +1,8 @@
 import requests
+import os
 from .gen_service import ApiService
 from configs.config import CMC_API_BASE_URL, CMC_LATEST_ENDPOINT, DEFAULT_CONVERT_TO_CURRENCY
-from configs.secrets_config import CMC_API_KEY_HEADER, CMC_API_KEY
+from configs.config import CMC_API_KEY_HEADER
 from utils.utils import load_cmc_id_mapping
 from utils.logger import logger
 
@@ -10,7 +11,20 @@ class CoinMarketCapService(ApiService):
     def __init__(self, currency_pairs):
         super().__init__(currency_pairs)
         self.latest_url = f"{CMC_API_BASE_URL}{CMC_LATEST_ENDPOINT}"
-        self.headers = {CMC_API_KEY_HEADER: CMC_API_KEY}
+        self.headers = {CMC_API_KEY_HEADER: self.get_api_key()}
+
+    def get_api_key(self):
+        # Attempt to import local secrets
+        try:
+            from configs.secrets_config import (
+                CMC_API_KEY as LOCAL_CMC_API_KEY
+            )
+        except ImportError:
+            # Define local variables as None if `secrets_config.py` is missing
+            LOCAL_CMC_API_KEY = None
+
+        # Use environment variables if available, otherwise fallback to local secrets
+        return os.getenv("CMC_API_KEY", LOCAL_CMC_API_KEY)
 
     def get_cmc_id(self, pair):
         mapping = load_cmc_id_mapping()
@@ -54,7 +68,6 @@ class CoinMarketCapService(ApiService):
         except Exception as e:
             logger.error(f"An error occurred while fetching prices: {e}")
             return []
-
 
     def parse_data_item(self, crypto_data):
         if not isinstance(crypto_data, dict):
