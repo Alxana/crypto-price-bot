@@ -1,5 +1,5 @@
 from telegram.ext import ContextTypes
-from utils.utils import get_price
+from utils.price_utils import get_price
 from utils.message_utils import format_price_update_message
 from bots.base_bot import BaseBot
 from utils.logger import logger
@@ -18,12 +18,12 @@ class CryptoPriceBot(BaseBot):
         """
         logger.info("Fetching prices...")
         messages = []
-        for currency in self.currencies:
-            price = get_price(currency, self.api)
+        prices = get_price(self.currencies, self.api)
+        for price in prices:
             if price:
                 messages.append(format_price_update_message(price))
             else:
-                messages.append(f"Failed to fetch price for {currency}.")
+                messages.append(f"Failed to fetch price for {price['symbol']}-{price['convert_to']}.")
 
         if messages:
             logger.info(f"Sending messages to chat {chat_id}...")

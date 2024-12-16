@@ -1,29 +1,30 @@
-from services.binance_service import BinanceService
-from services.gecko_service import GeckoService
-from .logger import logger
-
-API_SERVICES = {
-    "gecko": GeckoService,
-    "binance": BinanceService
-    # Add other APIs like "binance", "kraken" here
-}
+import json
 
 
-def get_price(currency_pair, api_name):
-    """
-    Fetch the current price for the given currency pair from the specified API.
-    :param currency_pair: A string representing the currency pair, e.g., "BNB-BTC".
-    :param api_name: A string representing the API name, e.g., "coinbase" or "gecko".
-    :return: A dictionary with the coin, current price, and 24h price change, or None if the request fails.
-    """
-    api_service_class = API_SERVICES.get(api_name.lower())
-    if not api_service_class:
-        logger.warn(f"Unsupported API: {api_name}")
-        return None
-    api_service = api_service_class()
+def load_crypto_mapping(file_path="configs/crypto_symbol_name_mapping.json"):
+    with open(file_path, "r") as f:
+        return json.load(f)
 
-    try:
-        return api_service.fetch_price(currency_pair)
-    except Exception as e:
-        logger.error(f"Error fetching price from {api_name}: {e}")
-        return None
+
+def load_cmc_id_mapping(file_path="configs/crypto_symbol_cmc_id_mapping.json"):
+    with open(file_path, "r") as f:
+        return json.load(f)
+
+
+def get_crypto_name_by_symbol(symbol):
+    mapping = load_crypto_mapping()
+    return mapping.get(symbol, "Unknown symbol")
+
+
+def get_first_symbol_from_pair(currency_pair):
+    # Split the pair into base and quote currencies (e.g., "BNB-BTC" -> "BNB", "BTC")
+    # and returns base one
+    base_currency, quote_currency = currency_pair.split("-")
+    return f"{base_currency.upper()}"
+
+
+def get_second_symbol_from_pair(currency_pair):
+    # Split the pair into base and quote currencies (e.g., "BNB-BTC" -> "BNB", "BTC")
+    # and returns quote one
+    base_currency, quote_currency = currency_pair.split("-")
+    return f"{quote_currency.upper()}"

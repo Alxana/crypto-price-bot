@@ -1,6 +1,6 @@
 import os
 import asyncio
-from bots.cryptoPriceBot import CryptoPriceBot
+from bots.crypto_price_bot import CryptoPriceBot
 from configs.config import DEFAULT_TRACKED_CURRENCIES, DEFAULT_API
 
 if __name__ == "__main__":

@@ -36,3 +36,5 @@ configs/secrets_config.py
 
 # Environment variables
 .env
+
+image_generation/

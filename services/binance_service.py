@@ -1,25 +1,27 @@
 import requests
+from .gen_service import ApiService
 from configs.config import BINANCE_API_BASE_URL, BINANCE_PRICE_ENDPOINT
 from utils.logger import logger
 
 
-class BinanceService:
-    URL = f"{BINANCE_API_BASE_URL}{BINANCE_PRICE_ENDPOINT}"
+class BinanceService(ApiService):
+    def __init__(self, currency_pair):
+        super().__init__(currency_pair)
+        self.url = f"{BINANCE_API_BASE_URL}{BINANCE_PRICE_ENDPOINT}"
 
-    def fetch_price(self, currency_pair):
+    def fetch_price(self):
         """
         Fetch price data from Binance API.
-        :param currency_pair: A string representing the currency pair, e.g., "BNB-BTC".
         :return: A JSON object with coin, current price, and price change.
         """
         try:
             # Split the pair into base and quote currencies (e.g., "BNB-BTC" -> "BNB", "BTC")
-            base_currency, quote_currency = currency_pair.split("-")
+            base_currency, quote_currency = self.currency_pair.split("-")
             symbol = f"{base_currency.upper()}{quote_currency.upper()}"
 
             # Make the request to Binance API
             params = {"symbol": symbol}
-            response = requests.get(self.URL, params=params)
+            response = requests.get(self.url, params=params)
             response.raise_for_status()
             data = response.json()
 
@@ -28,7 +30,7 @@ class BinanceService:
             price_change_24h = float(data.get("priceChangePercent", 0.0))
 
             return {
-                "coin": currency_pair,
+                "coin": self.currency_pair,
                 "currentPrice": current_price,
                 "priceChange24": price_change_24h
             }
