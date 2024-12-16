@@ -2,9 +2,9 @@ from telegram.ext import CommandHandler, ContextTypes, Application, JobQueue
 
 
 class BaseBot:
-    def __init__(self, token: str, channel_id: str):
+    def __init__(self, token: str, channel_ids: list):
         self.token = token
-        self.channel_id = channel_id
+        self.channel_ids = channel_ids
         # Enable JobQueue by setting it explicitly in the application
         self.application = Application.builder().token(token).build()
 

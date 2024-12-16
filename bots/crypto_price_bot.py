@@ -7,8 +7,8 @@ from configs.config import UPDATE_FREQUENCY
 
 
 class CryptoPriceBot(BaseBot):
-    def __init__(self, token: str, channel_id: str, currencies: list, api: str):
-        super().__init__(token, channel_id)
+    def __init__(self, token: str, channel_ids: list, currencies: list, api: str):
+        super().__init__(token, channel_ids)
         self.currencies = currencies
         self.api = api
 
@@ -41,7 +41,8 @@ class CryptoPriceBot(BaseBot):
         Perform a single run to fetch and send prices.
         """
         logger.info("Running single update...")
-        await self.send_prices(chat_id=self.channel_id)
+        for channel in self.channel_ids:
+            await self.send_prices(chat_id=channel)
         logger.info("Single update completed.")
 
     async def periodic_updates(self, context: ContextTypes.DEFAULT_TYPE):
@@ -49,7 +50,9 @@ class CryptoPriceBot(BaseBot):
         Job to periodically fetch and send prices.
         """
         logger.info("Running periodic updates...")
-        await self.send_prices(chat_id=self.channel_id)
+        for channel in self.channel_ids:
+            await self.send_prices(chat_id=channel)
+        logger.info("Periodic update completed...")
 
     def run_periodic_updates(self):
         """
