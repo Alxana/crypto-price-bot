@@ -1,3 +1,4 @@
+from telegram.error import TelegramError
 from telegram.ext import ContextTypes
 from utils.price_utils import get_price
 from utils.message_utils import format_price_update_message
@@ -12,6 +13,8 @@ class CryptoPriceBot(BaseBot):
         self.currencies = currencies
         self.api = api
 
+    from telegram.error import TelegramError
+
     async def send_prices(self, chat_id):
         """
         Fetch and send cryptocurrency prices to the specified chat ID.
@@ -19,6 +22,7 @@ class CryptoPriceBot(BaseBot):
         logger.info("Fetching prices...")
         messages = []
         prices = get_price(self.currencies, self.api)
+
         for price in prices:
             if price:
                 messages.append(format_price_update_message(price))
@@ -26,13 +30,17 @@ class CryptoPriceBot(BaseBot):
                 messages.append(f"Failed to fetch price for {price['symbol']}-{price['convert_to']}.")
 
         if messages:
-            logger.info(f"Sending messages to chat {chat_id}...")
-            await self.application.bot.send_message(
-                chat_id=chat_id,
-                text="\n".join(messages),
-                parse_mode='Markdown'
-            )
-            logger.info("Prices sent successfully!")
+            try:
+                logger.info(f"Sending messages to chat {chat_id}...")
+                await self.application.bot.send_message(
+                    chat_id=chat_id,
+                    text="\n".join(messages),
+                    parse_mode='Markdown'
+                )
+                logger.info("Prices sent successfully!")
+            except TelegramError as e:
+                # Log the error and continue execution
+                logger.warning(f"Failed to send message to chat {chat_id}. Error: {e}")
         else:
             logger.warning("No messages to send.")
 
