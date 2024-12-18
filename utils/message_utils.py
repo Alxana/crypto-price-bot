@@ -31,8 +31,8 @@ def format_price_update_message(price):
 
     # Construct the message with Markdown and monospaced font for alignment
     message = (
-        f"💰 `{price['symbol']:<4}`: *${current_price:>6}* ~"
-        f" 24h: {change_emoji_24} {price_change_str_24:>6}% ~"
-        f" 7d: {change_emoji_7d} {price_change_str_7d:>6}%"
+        f"💰 `{price['symbol']:<4}`: *${current_price:>6}* \n"
+        f" *24h:* {price_change_str_24:>4}%  {change_emoji_24}"
+        f" *7d:*  {price_change_str_7d:>4}%  {change_emoji_7d}"
     )
     return message
