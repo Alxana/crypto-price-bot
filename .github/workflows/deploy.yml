@@ -2,11 +2,11 @@ name: Deploy Telegram Bot
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
+  # push:
+  #   branches:
+  #     - main
   schedule:
-    - cron: '44 13,17 * * *'
+    - cron: '18 9 * * *'
 
 jobs:
   deploy:
