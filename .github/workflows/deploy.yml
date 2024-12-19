@@ -6,7 +6,7 @@ on:
   #   branches:
   #     - main
   schedule:
-    - cron: '18 9 * * *'
+    - cron: '44 9 * * *'
 
 jobs:
   deploy:
