@@ -1,57 +1,124 @@
 import io
-
+from datetime import datetime
 from PIL import Image, ImageDraw, ImageFont
 
-def generate_crypto_block(currency, prices):
+from utils.imageUtils import add_rounded_corners
+from utils.price_utils import format_price
+
+# Colors
+black_color = (0, 0, 0)
+white_color = (255, 255, 255)
+red_color = (255, 0, 0)
+green_color = (0, 128, 0)
+cobalt_blue_color = (0, 18, 69)
+
+font_path_med = "resources/fonts/Poppins-Medium.ttf"
+font_path_bold = "resources/fonts/Poppins-Bold.ttf"
+font_path_regular = "resources/fonts/Poppins-Regular.ttf"
+font_path_light = "resources/fonts/Poppins-Light.ttf"
+font_path_thin = "resources/fonts/Poppins-Thin.ttf"
 
 
+def generate_crypto_block(prices):
+    # Paths
+    bg_path = "resources/images/crypto_block_bg_800x796.png"
+    logo_path = f"resources/images/crypto_logos/{prices['symbol'].lower()}_logo.png"
 
+    # Coordinates
+    logo_coordinates = (40, 40)
+    title_coordinates = (520, 148)
+    price_coordinates = (400, 390)
+    price_change_24_coordinates = (531.5, 592)
+    price_change_7d_coordinates = (531.5, 714)
 
-def generate_price_image(btc_price, btc_change, trx_price, trx_change):
-    # Image size and background color
-    width, height = 800, 400
-    background_color = (10, 25, 50)  # Dark blue
+    # Texts
+    title_text = prices['symbol']
+    curr_price_text = f"$ {format_price(prices['price'])}"
+    price_change_24 = round(float(prices['percent_change_24h']), 2)
+    if price_change_24 > 0:
+        price_change_24_text = f"+{price_change_24}%"
+        price_change_24_color = green_color
+    else:
+        price_change_24_text = f"{price_change_24}%"
+        price_change_24_color = red_color
 
-    # Create an empty image
-    image = Image.new("RGB", (width, height), background_color)
-    draw = ImageDraw.Draw(image)
+    price_change_7d = round(float(prices['percent_change_7d']), 2)
+    if price_change_7d > 0:
+        price_change_7d_text = f"+{price_change_7d}%"
+        price_change_7d_color = green_color
+    else:
+        price_change_7d_text = f"{price_change_7d}%"
+        price_change_7d_color = red_color
 
-    # Fonts (using default font as fallback)
+    bg = Image.open(bg_path)
+    logo = Image.open(logo_path)
+    logo = logo.resize((216, 216))
+    bg.paste(logo, logo_coordinates, logo)
+    draw_block = ImageDraw.Draw(bg)
+
+    # fonts (using default font as fallback)
     try:
-        title_font = ImageFont.truetype("arial.ttf", 40)
-        price_font = ImageFont.truetype("arial.ttf", 30)
-        change_font = ImageFont.truetype("arial.ttf", 25)
+        title_font = ImageFont.truetype(font_path_med, 150)
+        price_font = ImageFont.truetype(font_path_bold, 110)
+        change_font = ImageFont.truetype(font_path_med, 88.1)
     except OSError:
         print("Custom font not found. Using default font.")
         title_font = ImageFont.load_default()
         price_font = ImageFont.load_default()
         change_font = ImageFont.load_default()
 
-    # Title text
-    title_text = "Cryptocurrency Prices"
-    title_width = draw.textlength(title_text, font=title_font)
-    draw.text(((width - title_width) // 2, 20), title_text, fill=(255, 255, 255), font=title_font)
+    draw_block.text(title_coordinates, title_text,
+                    font=title_font, fill=cobalt_blue_color, anchor='mm', stroke_width=1, stroke_fill=white_color)
+    draw_block.text(price_coordinates, curr_price_text,
+                    font=price_font, fill=black_color, anchor='mm', stroke_width=1, stroke_fill=white_color)
+    draw_block.text(price_change_24_coordinates, price_change_24_text,
+                    font=change_font, fill=price_change_24_color, anchor='mb', stroke_width=1, stroke_fill=white_color)
+    draw_block.text(price_change_7d_coordinates, price_change_7d_text,
+                    font=change_font, fill=price_change_7d_color, anchor='mb', stroke_width=1, stroke_fill=white_color)
 
-    # BTC section
-    btc_x, btc_y = 100, 100
-    draw.text((btc_x, btc_y), "Bitcoin (BTC)", fill=(255, 165, 0), font=price_font)
-    draw.text((btc_x, btc_y + 50), f"Price: {btc_price}$", fill=(255, 255, 255), font=price_font)
+    block_image = bg.resize((200, 200), resample=Image.Resampling.LANCZOS)
 
-    btc_change_color = (0, 255, 0) if btc_change >= 0 else (255, 0, 0)
-    draw.text((btc_x, btc_y + 100), f"Change: {btc_change:+.2f}$", fill=btc_change_color, font=change_font)
+    # Ensure the resized image has an alpha channel
+    if block_image.mode != "RGBA":
+        block_image = block_image.convert("RGBA")
 
-    # TRX section
-    trx_x, trx_y = 450, 100
-    draw.text((trx_x, trx_y), "Tron (TRX)", fill=(0, 191, 255), font=price_font)
-    draw.text((trx_x, trx_y + 50), f"Price: {trx_price}$", fill=(255, 255, 255), font=price_font)
+    return add_rounded_corners(block_image, 30)
 
-    trx_change_color = (0, 255, 0) if trx_change >= 0 else (255, 0, 0)
-    draw.text((trx_x, trx_y + 100), f"Change: {trx_change:+.2f}$", fill=trx_change_color, font=change_font)
 
-    # Save image to BytesIO object
-    output = io.BytesIO()
-    image.save(output, format="PNG")
-    output.seek(0)  # Rewind the BytesIO buffer
-    return output
+def generate_price_update_image(prices):
+    bg_path_6_blocks = "resources/images/bg_3blocks_640x555.png"
+    bg = Image.open(bg_path_6_blocks)
+    title_font = ImageFont.truetype(font_path_light, 30)
+    version_font = ImageFont.truetype(font_path_light, 20)
+    date_coordinates = (85, 37)
+    time_coordinates = (620, 37)
+    block_coordinates = [(10, 80), (220, 80), (430, 80), (10, 290), (220, 290), (430, 290)]
+    version_coordinates = (10, 545)
+
+    for index, currency in enumerate(prices):
+        block = generate_crypto_block(currency)
+        bg.paste(block, block_coordinates[index], block)
+
+    dashboard_img = ImageDraw.Draw(bg)
+
+    # Get the current date and time
+    now = datetime.now()
+
+    dashboard_img.text(date_coordinates, now.strftime("%d %B %Y"),
+                    font=title_font, fill=white_color, anchor='lm')
+    dashboard_img.text(time_coordinates, now.strftime("%H:%M"),
+                    font=title_font, fill=white_color, anchor='rm')
+    dashboard_img.text(version_coordinates, "v1.1",
+                    font=title_font, fill=white_color, anchor='lb')
+
+    ImageDraw.Draw(bg)
+
+    # Save the Pillow image to an in-memory file-like object
+    final_image = io.BytesIO()
+    bg.save(final_image, format="PNG")
+    final_image.seek(0)
+
+    return final_image
+
 
 
