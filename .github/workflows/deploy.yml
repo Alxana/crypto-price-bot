@@ -2,35 +2,56 @@ name: Deploy Telegram Bot
 
 on:
   workflow_dispatch:
-  # push:
-  #   branches:
-  #     - main
+  push:
+    branches:
+      - main
   schedule:
-    - cron: '44 9 * * *'
+    - cron: '44 9 * * *'  # First schedule
+    - cron: '44 11,14,17,20 * * *'  # Second schedule (different time)
 
 jobs:
-  deploy:
+  deploy_main:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.9'
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
 
-    - name: Install dependencies
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
 
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
+      - name: Run the bot (Main Channel)
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          CHANNEL_IDS: ${{ secrets.CHANNEL_IDS }}
+          CMC_API_KEY: ${{ secrets.CMC_API_KEY }}
+        run: python main.py
 
-    - name: Run the bot
-      env:
-        TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-        CHANNEL_IDS: ${{ secrets.CHANNEL_IDS }}
-        CMC_API_KEY: ${{ secrets.CMC_API_KEY }}
+  deploy_test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
-      run: python main.py
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run the bot (Test Channel)
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          CHANNEL_IDS: ${{ secrets.TEST_CHANNEL_IDS }}
+          CMC_API_KEY: ${{ secrets.CMC_API_KEY }}
+        run: python main.py
