@@ -2,15 +2,16 @@ name: Deploy Telegram Bot
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
+  # push:
+  #   branches:
+  #     - main
   schedule:
-    - cron: '44 9 * * *'  # First schedule
-    - cron: '44 11,14,17,20 * * *'  # Second schedule (different time)
+    - cron: '44 9 * * *'         # First schedule for deploy_main
+    - cron: '44 11,14,17,20 * * *'  # Second schedule for deploy_test
 
 jobs:
   deploy_main:
+    if: github.event.schedule == '44 9 * * *' # Restrict to first schedule
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -34,6 +35,7 @@ jobs:
         run: python main.py
 
   deploy_test:
+    if: github.event.schedule == '44 11,14,17,20 * * *' # Restrict to second schedule
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
