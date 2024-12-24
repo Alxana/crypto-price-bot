@@ -1,5 +1,7 @@
 from telegram.error import TelegramError
 from telegram.ext import ContextTypes
+
+from image_generation.priceUpdateImage import generate_price_update_image, generate_crypto_block
 from utils.price_utils import get_price
 from utils.message_utils import format_price_update_message
 from bots.base_bot import BaseBot
@@ -13,9 +15,7 @@ class CryptoPriceBot(BaseBot):
         self.currencies = currencies
         self.api = api
 
-    from telegram.error import TelegramError
-
-    async def send_prices(self, chat_id):
+    async def send_text_prices(self, chat_id):
         """
         Fetch and send cryptocurrency prices to the specified chat ID.
         """
@@ -44,13 +44,32 @@ class CryptoPriceBot(BaseBot):
         else:
             logger.warning("No messages to send.")
 
+    async def send_prices_img(self, chat_id):
+        """
+        Fetch and send cryptocurrency prices to the specified chat ID.
+        """
+        logger.info("Fetching prices...")
+        messages = []
+        prices = get_price(self.currencies, self.api)
+
+        img = generate_price_update_image(prices)
+
+        try:
+            logger.info(f"Sending messages to chat {chat_id}...")
+            await self.application.bot.send_photo(chat_id=chat_id, photo=img)
+            logger.info("Prices sent successfully!")
+        except TelegramError as e:
+            # Log the error and continue execution
+            logger.warning(f"Failed to send message to chat {chat_id}. Error: {e}")
+
     async def run_single_update(self):
         """
         Perform a single run to fetch and send prices.
         """
         logger.info("Running single update...")
         for channel in self.channel_ids:
-            await self.send_prices(chat_id=channel)
+            # await self.send_text_prices(chat_id=channel)
+            await self.send_prices_img(chat_id=channel)
         logger.info("Single update completed.")
 
     async def periodic_updates(self, context: ContextTypes.DEFAULT_TYPE):
@@ -59,7 +78,7 @@ class CryptoPriceBot(BaseBot):
         """
         logger.info("Running periodic updates...")
         for channel in self.channel_ids:
-            await self.send_prices(chat_id=channel)
+            await self.send_text_prices(chat_id=channel)
         logger.info("Periodic update completed...")
 
     def run_periodic_updates(self):
