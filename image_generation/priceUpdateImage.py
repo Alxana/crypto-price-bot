@@ -4,6 +4,7 @@ from PIL import Image, ImageDraw, ImageFont
 
 from utils.imageUtils import add_rounded_corners
 from utils.price_utils import format_price
+from utils.date_utils import get_current_date_or_time
 
 # Colors
 black_color = (0, 0, 0)
@@ -89,7 +90,7 @@ def generate_price_update_image(prices):
     bg_path_6_blocks = "resources/images/bg_3blocks_640x555.png"
     bg = Image.open(bg_path_6_blocks)
     title_font = ImageFont.truetype(font_path_light, 30)
-    version_font = ImageFont.truetype(font_path_light, 20)
+    version_font = ImageFont.truetype(font_path_light, 18)
     date_coordinates = (85, 37)
     time_coordinates = (620, 37)
     block_coordinates = [(10, 80), (220, 80), (430, 80), (10, 290), (220, 290), (430, 290)]
@@ -102,14 +103,15 @@ def generate_price_update_image(prices):
     dashboard_img = ImageDraw.Draw(bg)
 
     # Get the current date and time
-    now = datetime.now()
+    current_date = get_current_date_or_time("UTC+1", "%d %B %Y")
+    current_time = get_current_date_or_time("UTC+1", "%H:%M")
 
-    dashboard_img.text(date_coordinates, now.strftime("%d %B %Y"),
-                    font=title_font, fill=white_color, anchor='lm')
-    dashboard_img.text(time_coordinates, now.strftime("%H:%M"),
-                    font=title_font, fill=white_color, anchor='rm')
+    dashboard_img.text(date_coordinates, current_date,
+                       font=title_font, fill=white_color, anchor='lm')
+    dashboard_img.text(time_coordinates, current_time,
+                       font=title_font, fill=white_color, anchor='rm')
     dashboard_img.text(version_coordinates, "v1.1",
-                    font=title_font, fill=white_color, anchor='lb')
+                       font=version_font, fill=white_color, anchor='lb')
 
     ImageDraw.Draw(bg)
 
@@ -119,6 +121,3 @@ def generate_price_update_image(prices):
     final_image.seek(0)
 
     return final_image
-
-
-
