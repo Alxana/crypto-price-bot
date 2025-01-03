@@ -3,14 +3,14 @@ name: Test Deploy
 on:
   workflow_dispatch:
   push:
-     branches:
-       - main
+    branches:
+      - main
   schedule:
     - cron: '44 11,14,17,20 * * *'  # Second schedule for deploy_test
 
 jobs:
   deploy_test:
-    if: github.event.schedule == '44 11,14,17,20 * * *' # Restrict to second schedule
+    if: github.event_name == 'schedule' || github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
