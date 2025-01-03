@@ -1,0 +1,35 @@
+name: Test Deploy
+
+on:
+  workflow_dispatch:
+  push:
+     branches:
+       - main
+  schedule:
+    - cron: '44 11,14,17,20 * * *'  # Second schedule for deploy_test
+
+jobs:
+  deploy_test:
+    if: github.event.schedule == '44 11,14,17,20 * * *' # Restrict to second schedule
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run the bot (Test Channel)
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TRACKED_CURRENCIES: ${{ secrets.TEST_TRACKED_CURRENCIES }}
+          CHANNEL_IDS: ${{ secrets.TEST_CHANNEL_IDS }}
+          CMC_API_KEY: ${{ secrets.CMC_API_KEY }}
+        run: python main.py
