@@ -30,6 +30,7 @@ jobs:
       - name: Run the bot (Main Channel)
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TRACKED_CURRENCIES: ${{ secrets.TRACKED_CURRENCIES }}
           CHANNEL_IDS: ${{ secrets.CHANNEL_IDS }}
           CMC_API_KEY: ${{ secrets.CMC_API_KEY }}
         run: python main.py
@@ -54,6 +55,7 @@ jobs:
       - name: Run the bot (Test Channel)
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TRACKED_CURRENCIES: ${{ secrets.TEST_TRACKED_CURRENCIES }}
           CHANNEL_IDS: ${{ secrets.TEST_CHANNEL_IDS }}
           CMC_API_KEY: ${{ secrets.CMC_API_KEY }}
         run: python main.py

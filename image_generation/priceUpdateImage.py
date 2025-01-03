@@ -53,6 +53,11 @@ def generate_crypto_block(prices):
 
     bg = Image.open(bg_path)
     logo = Image.open(logo_path)
+
+    # Check if the image is in "P" mode (palette-based)
+    if logo.mode == "P":
+        logo = logo.convert("RGBA")  # Convert to RGBA mode
+
     logo = logo.resize((216, 216))
     bg.paste(logo, logo_coordinates, logo)
     draw_block = ImageDraw.Draw(bg)

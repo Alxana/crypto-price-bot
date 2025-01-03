@@ -49,7 +49,6 @@ class CryptoPriceBot(BaseBot):
         Fetch and send cryptocurrency prices to the specified chat ID.
         """
         logger.info("Fetching prices...")
-        messages = []
         prices = get_price(self.currencies, self.api)
 
         img = generate_price_update_image(prices)

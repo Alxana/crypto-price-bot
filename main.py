@@ -9,12 +9,13 @@ if __name__ == "__main__":
     token = return_secret("TELEGRAM_BOT_TOKEN")
     channel_ids = return_secret("CHANNEL_IDS")
     channel_ids = csv_secret_to_array(channel_ids) if isinstance(channel_ids, str) else channel_ids
+    tracked_currencies = return_secret("TRACKED_CURRENCIES")
 
     # Initialize and run the bot        
     crypto_bot = CryptoPriceBot(
         token=token,
         channel_ids=channel_ids,
-        currencies=DEFAULT_TRACKED_CURRENCIES,
+        currencies=tracked_currencies,
         api=DEFAULT_API
     )
     asyncio.run(crypto_bot.run_single_update())
