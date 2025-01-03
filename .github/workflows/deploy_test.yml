@@ -5,12 +5,10 @@ on:
   push:
     branches:
       - main
-  schedule:
-    - cron: '44 11,14,17,20 * * *'  # Second schedule for deploy_test
 
 jobs:
   deploy_test:
-    if: github.event_name == 'schedule' || github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
