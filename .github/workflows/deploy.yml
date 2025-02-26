@@ -7,7 +7,7 @@ on:
   #     - main
   schedule:
     - cron: '44 9 * * *'         # First schedule for deploy_main
-    - cron: '44 11,14,17,20 * * *'  # Second schedule for deploy_test
+    - cron: '44 6,12,18 * * *'  # Second schedule for deploy_test
 
 jobs:
   deploy_main:
